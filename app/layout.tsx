@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import BackgroundAnimation from "@/app/components/BackgroundAnimation";
+import MusicPlayer from "@/app/components/MusicPlayer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +26,8 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        <BackgroundAnimation />
+        <MusicPlayer />
         {children}
         <Script src="https://www.tiktok.com/embed.js" strategy="lazyOnload" />
       </body>

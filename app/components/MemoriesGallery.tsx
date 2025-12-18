@@ -1,20 +1,25 @@
 'use client';
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules';
-
-// Import Swiper styles - already imported in main CSS or global, but good to have here if needed
-// However, since we import 'love-story.css' globally or in page, it should be fine.
-// But imports in components for CSS modules is sometimes safer.
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-import 'swiper/css/pagination';
+import { useRef } from 'react';
+import Autoplay from "embla-carousel-autoplay"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface MemoriesGalleryProps {
   images: string[];
 }
 
 export default function MemoriesGallery({ images }: MemoriesGalleryProps) {
+  const plugin = useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: false })
+  )
+
   return (
     <section>
       <div className="text-center mb-8">
@@ -22,37 +27,38 @@ export default function MemoriesGallery({ images }: MemoriesGalleryProps) {
         <div className="h-1 w-24 bg-white mx-auto rounded-full opacity-50"></div>
       </div>
       
-      <Swiper
-        effect={'coverflow'}
-        grabCursor={true}
-        centeredSlides={true}
-        slidesPerView={'auto'}
-        coverflowEffect={{
-          rotate: 50,
-          stretch: 0,
-          depth: 100,
-          modifier: 1,
-          slideShadows: true,
-          scale: 0.8, // Add scaling to make side images smaller
-        }}
-        pagination={{ clickable: true }}
-        autoplay={{
-          delay: 2500,
-          disableOnInteraction: false,
-        }}
-        modules={[EffectCoverflow, Pagination, Autoplay]}
-        className="mySwiper"
-      >
-        {images.map((img, index) => (
-          <SwiperSlide key={index} className="!w-[250px] !h-[350px] md:!w-[300px] md:!h-[400px]">
-            <img 
-              src={img} 
-              alt={`Memory ${index + 1}`} 
-              className="w-full h-full object-cover rounded-2xl block shadow-lg"
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="flex justify-center w-full px-4">
+        <Carousel
+          plugins={[plugin.current]}
+          className="w-full max-w-md lg:max-w-4xl"
+          opts={{
+            align: "center",
+            loop: true,
+          }}
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {images.map((img, index) => (
+              <CarouselItem key={index} className="pl-2 md:pl-4 basis-[85%] md:basis-1/2 lg:basis-1/3">
+                <div className="p-1">
+                  <Card className="border-none bg-transparent shadow-none">
+                    <CardContent className="flex aspect-[3/4] items-center justify-center p-0">
+                      <div className="w-full h-full p-2 glass-card rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                        <img 
+                          src={img} 
+                          alt={`Memory ${index + 1}`} 
+                          className="w-full h-full object-cover rounded-xl"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden md:flex bg-white/20 hover:bg-white/40 border-none text-white" />
+          <CarouselNext className="hidden md:flex bg-white/20 hover:bg-white/40 border-none text-white" />
+        </Carousel>
+      </div>
     </section>
   );
 }

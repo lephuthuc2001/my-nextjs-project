@@ -1,34 +1,13 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import { cookies } from 'next/headers';
 import './love-story.css';
-import BackgroundAnimation from './components/BackgroundAnimation';
-import MusicPlayer from './components/MusicPlayer';
-import LoginScreen from './components/LoginScreen';
-import LoveHeader from './components/LoveHeader';
-import TimeCounters from './components/TimeCounters';
-import MemoriesGallery from './components/MemoriesGallery';
-import Milestones from './components/Milestones';
-import SocialFollow from './components/SocialFollow';
+import LoginScreen from '@/app/components/LoginScreen';
+import MainPage from '@/app/components/MainPage';
 
 export default function LoveStory() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const cookieStore = cookies();
+  const session = cookieStore.get('session');
+  const isLoggedIn = !!session?.value;
 
-  useEffect(() => {
-    const savedLogin = localStorage.getItem('isLoggedIn');
-    if (savedLogin === 'true') {
-      setIsLoggedIn(true);
-    }
-    setIsLoading(false);
-  }, []);
-
-  const handleLogin = () => {
-    localStorage.setItem('isLoggedIn', 'true');
-    setIsLoggedIn(true);
-  };
-
-  const correctCredential = "29-06-2025";
   const startDate = new Date('2025-07-01T00:00:00');
   const nextMilestoneDate = new Date('2026-01-01T00:00:00');
 
@@ -44,35 +23,16 @@ export default function LoveStory() {
     '/img/z7008123793908_afefd62fedef050cfa34227d737776b9.jpg',
   ];
 
-  if (isLoading) return null;
-
   return (
     <div className="text-white min-h-screen">
-      <BackgroundAnimation />
-      <MusicPlayer />
-
-      {!isLoggedIn && (
-        <LoginScreen 
-          onLogin={handleLogin}  
-          correctCredential={correctCredential} 
-        />
-      )}
+      {!isLoggedIn && <LoginScreen />}
 
       {isLoggedIn && (
-        <div className="container mx-auto px-4 py-8 relative z-10 animate-fade-in-up">
-          <LoveHeader />
-
-          <main className="max-w-5xl mx-auto space-y-16">
-            <TimeCounters startDate={startDate} />
-            <MemoriesGallery images={images} />
-            <Milestones nextMilestoneDate={nextMilestoneDate} />
-            <SocialFollow />
-          </main>
-
-          <footer className="text-center mt-16 pb-8 text-white/80">
-            <p>Made with <i className="fas fa-heart text-red-500 animate-pulse"></i> for Thu Hà</p>
-          </footer>
-        </div>
+        <MainPage 
+          startDate={startDate}
+          nextMilestoneDate={nextMilestoneDate}
+          images={images}
+        />
       )}
     </div>
   );
