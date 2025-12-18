@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { authenticate } from '@/app/actions';
+import { useIMask } from 'react-imask';
+
+import IMask from 'imask';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -12,26 +15,59 @@ export default function LoginScreen() {
   const [error, setError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleCredentialInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '');
-    
-    // Auto-format DD-MM-YYYY
-    if (value.length > 8) value = value.slice(0, 8);
-    
-    if (value.length > 4) {
-      value = value.slice(0, 2) + '-' + value.slice(2, 4) + '-' + value.slice(4);
-    } else if (value.length > 2) {
-      value = value.slice(0, 2) + '-' + value.slice(2);
+  // Configure a smart Date mask with hooks
+  const { ref, maskRef } = useIMask({
+    mask: Date,
+    pattern: 'd-m-Y',
+    blocks: {
+      d: {
+        mask: IMask.MaskedRange,
+        from: 1,
+        to: 31,
+        maxLength: 2,
+      },
+      m: {
+        mask: IMask.MaskedRange,
+        from: 1,
+        to: 12,
+        maxLength: 2,
+      },
+      Y: {
+        mask: IMask.MaskedRange,
+        from: 1900,
+        to: 2099,
+        maxLength: 4,
+      }
+    },
+    format: (date: Date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    },
+    parse: (str: string) => {
+      const [d, m, y] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    },
+    lazy: false,
+    autofix: true,
+    overwrite: true,
+  } as any, 
+  {
+    onAccept: (value: string) => {
+      setCredential(value);
+    },
+    onComplete: (value: string) => {
+      handleAuth(value);
     }
-    
-    setCredential(value);
-    
+  });
+
+  const handleAuth = async (value: string) => {
     if (value.length === 10) {
       const result = await authenticate(value);
       if (result.success) {
         setError(false);
         setIsSuccess(true);
-        // Add a small delay for better UX interactions and animation
         setTimeout(() => {
           router.refresh();
         }, 1500);
@@ -41,6 +77,13 @@ export default function LoginScreen() {
       }
     } else {
       setError(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      const currentVal = maskRef.current?.value || credential;
+      handleAuth(currentVal);
     }
   };
 
@@ -62,12 +105,10 @@ export default function LoginScreen() {
           
           <div className="relative">
             <Input 
-              type="text" 
-              value={credential}
-              onChange={handleCredentialInput}
+              ref={ref as any}
               disabled={isSuccess}
-              placeholder="DD-MM-YYYY" 
-              maxLength={10}
+              placeholder='DD-MM-YYYY'
+              onKeyDown={handleKeyDown}
               className={`w-full bg-white/50 border-2 rounded-xl px-4 py-3 text-center text-2xl tracking-widest focus-visible:ring-2 focus-visible:ring-pink-200 focus-visible:ring-offset-0 placeholder:text-pink-300 transition-all font-mono h-16 ${
                 error ? 'border-red-400 animate-shake' : 
                 isSuccess ? 'border-green-400 text-green-600 bg-green-50' : 'border-pink-200 text-pink-600'
