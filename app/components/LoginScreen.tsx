@@ -105,11 +105,15 @@ export default function LoginScreen() {
             <Card className="glass-card border-none bg-white/30 p-8 rounded-3xl w-full text-center shadow-2xl">
               <CardContent className="p-0">
                 <motion.div 
-                  className="mb-6"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="mb-6 flex justify-center"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ repeat: Infinity, duration: 3 }}
                 >
-                  <i className="fas fa-heart text-5xl text-pink-500"></i>
+                  <img 
+                    src="/img/chibi-logo.png" 
+                    alt="Chibi Logo" 
+                    className="w-20 h-20 object-cover rounded-full border-2 border-white shadow-lg"
+                  />
                 </motion.div>
                 
                 <h2 className="text-3xl font-bold text-pink-600 mb-2 script-font">
@@ -165,11 +169,15 @@ export default function LoginScreen() {
             className="text-center"
           >
              <motion.div 
-                className="mb-4"
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
+                className="mb-4 flex justify-center"
+                animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+                transition={{ repeat: Infinity, duration: 2 }}
              >
-                <i className="fas fa-heart text-6xl text-green-500"></i>
+                <img 
+                  src="/img/chibi-logo.png" 
+                  alt="Chibi Logo" 
+                  className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-2xl"
+                />
              </motion.div>
              <h2 className="text-4xl font-bold text-pink-600 mb-2 script-font">
                Welcome Home ❤️
