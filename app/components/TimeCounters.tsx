@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "motion/react";
 
 interface TimeCountersProps {
   startDate: Date;
@@ -30,7 +31,11 @@ export default function TimeCounters({ startDate }: TimeCountersProps) {
   }, [startDate]);
 
   return (
-    <section className="text-center float">
+    <motion.section 
+      animate={{ y: [0, -10, 0] }}
+      transition={{ duration: 4, ease: "easeInOut", repeat: Infinity }}
+      className="text-center"
+    >
       <Card className="glass-card bg-transparent border-none rounded-[40px] p-8 md:p-12 inline-block max-w-3xl w-full">
         <CardContent className="p-0">
           <h2 className="text-3xl md:text-4xl mb-8 text-pink-600">We&apos;ve been together for</h2>
@@ -59,6 +64,6 @@ export default function TimeCounters({ startDate }: TimeCountersProps) {
           </div>
         </CardContent>
       </Card>
-    </section>
+    </motion.section>
   );
 }

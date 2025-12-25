@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { motion } from "motion/react";
 import Autoplay from "embla-carousel-autoplay"
 import {
   Carousel,
@@ -42,13 +43,17 @@ export default function MemoriesGallery({ images }: MemoriesGalleryProps) {
                 <div className="p-1">
                   <Card className="border-none bg-transparent shadow-none">
                     <CardContent className="flex aspect-[3/4] items-center justify-center p-0">
-                      <div className="w-full h-full p-2 glass-card rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                      <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full h-full p-2 glass-card rounded-2xl overflow-hidden"
+                      >
                         <img 
                           src={img} 
                           alt={`Memory ${index + 1}`} 
                           className="w-full h-full object-cover rounded-xl"
                         />
-                      </div>
+                      </motion.div>
                     </CardContent>
                   </Card>
                 </div>

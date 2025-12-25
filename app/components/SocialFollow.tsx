@@ -1,11 +1,22 @@
 'use client';
 
 import Script from 'next/script';
+import { motion } from "motion/react";
 
 export default function SocialFollow() {
   return (
-    <section className="text-center">
-      <div className="glass-card rounded-3xl p-8 max-w-2xl mx-auto">
+    <motion.section 
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      className="text-center"
+    >
+      <motion.div 
+        whileHover={{ rotate: [0, -2, 2, -2, 0] }}
+        transition={{ duration: 0.5 }}
+        className="glass-card rounded-3xl p-8 max-w-2xl mx-auto"
+      >
         <h3 className="text-3xl font-bold text-pink-600 mb-6">
           <i className="fab fa-tiktok mr-2"></i> Follow Our Journey
         </h3>
@@ -25,7 +36,7 @@ export default function SocialFollow() {
           </blockquote>
           {/* We use next/script in layout for better performance, but ensuring it's loaded here just in case or using standard script tag if needed */}
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }

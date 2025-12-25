@@ -1,24 +1,27 @@
 'use server'
 
-import { cookies } from 'next/headers'
-import { revalidatePath } from 'next/cache'
+import { signIn, signOut } from '@/auth'
+import { AuthError } from 'next-auth'
 
 export async function authenticate(date: string) {
-  if (date === '29-06-2025') { 
-    // Set cookie for 30 days
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-    cookies().set('session', 'authenticated', { 
-      expires,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    })
+  try {
+    // We use redirect: false to allow the client to handle the success state (animations)
+    // before reloading/redirecting.
+    await signIn('credentials', { date, redirect: false })
     return { success: true }
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return { success: false }
+        default:
+          return { success: false }
+      }
+    }
+    throw error
   }
-  return { success: false }
 }
 
 export async function logout() {
-  cookies().delete('session')
-  revalidatePath('/')
+  await signOut({ redirectTo: '/' })
 }

@@ -1,12 +1,12 @@
-import { cookies } from 'next/headers';
+import { auth } from '@/auth';
+import { logout } from '@/app/actions'; // Explicitly import logout if used, though it's not used in this snippet, the original file didn't import it in these lines.
 import './love-story.css';
 import LoginScreen from '@/app/components/LoginScreen';
 import MainPage from '@/app/components/MainPage';
 
-export default function LoveStory() {
-  const cookieStore = cookies();
-  const session = cookieStore.get('session');
-  const isLoggedIn = !!session?.value;
+export default async function LoveStory() {
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
 
   const startDate = new Date('2025-07-01T00:00:00');
   const nextMilestoneDate = new Date('2026-01-01T00:00:00');

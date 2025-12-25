@@ -26,7 +26,7 @@ export default function MusicPlayer() {
         <i className={`fas fa-music text-xl music-disc ${isPlaying ? 'text-pink-600' : 'text-gray-400'}`}></i>
       </button>
       <audio ref={audioRef} id="bgMusic" loop>
-        <source src="/love-song.mp3" type="audio/mpeg" />
+        <source src="/music/all-of-me-hook.mp3" type="audio/mpeg" />
       </audio>
     </div>
   );

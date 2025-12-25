@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { authenticate } from '@/app/actions';
 import { useIMask } from 'react-imask';
-
+import { motion, AnimatePresence } from "motion/react";
 import IMask from 'imask';
 
 export default function LoginScreen() {
@@ -88,45 +88,98 @@ export default function LoginScreen() {
   };
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-1000 ${isSuccess ? 'bg-white/50 backdrop-blur-sm' : ''}`}>
-      <Card className={`glass-card border-none bg-transparent p-8 rounded-3xl max-w-md w-full text-center shadow-2xl transform transition-all duration-700 ${
-        isSuccess ? 'scale-110 opacity-0 translate-y-[-20px]' : 'hover:scale-105'
-      }`}>
-        <CardContent className="p-0">
-          <div className="mb-6">
-            <i className={`fas fa-heart text-5xl animate-pulse ${isSuccess ? 'text-green-500' : 'text-pink-500'}`}></i>
-          </div>
-          <h2 className="text-3xl font-bold text-pink-600 mb-2 script-font">
-            {isSuccess ? 'Welcome Home ❤️' : 'Welcome, my Love'}
-          </h2>
-          <p className="text-gray-700 mb-6">
-            {isSuccess ? 'Unlocking our memories...' : 'Please enter our special date to verify it\'s you ❤️'}
-          </p>
-          
-          <div className="relative">
-            <Input 
-              ref={ref as any}
-              disabled={isSuccess}
-              placeholder='DD-MM-YYYY'
-              onKeyDown={handleKeyDown}
-              className={`w-full bg-white/50 border-2 rounded-xl px-4 py-3 text-center text-2xl tracking-widest focus-visible:ring-2 focus-visible:ring-pink-200 focus-visible:ring-offset-0 placeholder:text-pink-300 transition-all font-mono h-16 ${
-                error ? 'border-red-400 animate-shake' : 
-                isSuccess ? 'border-green-400 text-green-600 bg-green-50' : 'border-pink-200 text-pink-600'
-              }`}
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              {isSuccess ? (
-                <i className="fas fa-check text-green-500 text-xl"></i>
-              ) : (
-                <i className="fas fa-key text-pink-400"></i>
-              )}
-            </div>
-          </div>
-          <p className={`text-red-500 text-sm mt-3 h-5 transition-opacity duration-300 ${error ? 'opacity-100' : 'opacity-0'}`}>
-            Incorrect date, please try again
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <AnimatePresence>
+      {!isSuccess && (
+        <motion.div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 1.1, opacity: 0, y: -20 }}
+            transition={{ type: "spring", duration: 0.7 }}
+            className="w-full max-w-md"
+          >
+            <Card className="glass-card border-none bg-white/30 p-8 rounded-3xl w-full text-center shadow-2xl">
+              <CardContent className="p-0">
+                <motion.div 
+                  className="mb-6"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  <i className="fas fa-heart text-5xl text-pink-500"></i>
+                </motion.div>
+                
+                <h2 className="text-3xl font-bold text-pink-600 mb-2 script-font">
+                  Welcome, my Love
+                </h2>
+                <p className="text-gray-700 mb-6">
+                  Please enter our special date to verify it's you ❤️
+                </p>
+                
+                <div className="relative">
+                  <motion.div
+                    animate={error ? { x: [-10, 10, -10, 10, 0] } : {}}
+                    transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                  >
+                    <Input 
+                      ref={ref as any}
+                      placeholder='DD-MM-YYYY'
+                      onKeyDown={handleKeyDown}
+                      className={`w-full bg-white/50 border-2 rounded-xl px-4 py-3 text-center text-2xl tracking-widest focus-visible:ring-2 focus-visible:ring-pink-200 focus-visible:ring-offset-0 placeholder:text-pink-300 transition-all font-mono h-16 ${
+                        error ? 'border-red-400 text-red-500' : 'border-pink-200 text-pink-600'
+                      }`}
+                    />
+                  </motion.div>
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                     <i className="fas fa-key text-pink-400"></i>
+                  </div>
+                </div>
+                
+                <motion.p 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: error ? 1 : 0, height: error ? 'auto' : 0 }}
+                  className="text-red-500 text-sm mt-3"
+                >
+                  Incorrect date, please try again
+                </motion.p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+      )}
+      
+      {isSuccess && (
+        <motion.div
+          key="success"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-white/50 backdrop-blur-sm"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", duration: 0.8 }}
+            className="text-center"
+          >
+             <motion.div 
+                className="mb-4"
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+             >
+                <i className="fas fa-heart text-6xl text-green-500"></i>
+             </motion.div>
+             <h2 className="text-4xl font-bold text-pink-600 mb-2 script-font">
+               Welcome Home ❤️
+             </h2>
+             <p className="text-xl text-gray-700">
+               Unlocking our memories...
+             </p>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

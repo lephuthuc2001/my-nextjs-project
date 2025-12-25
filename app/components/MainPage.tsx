@@ -1,10 +1,12 @@
 'use client';
 
+import { logout } from '@/app/actions';
 import LoveHeader from './LoveHeader';
 import TimeCounters from './TimeCounters';
 import MemoriesGallery from './MemoriesGallery';
 import Milestones from './Milestones';
 import SocialFollow from './SocialFollow';
+import { motion } from "motion/react";
 
 interface MainPageProps {
   startDate: Date;
@@ -14,7 +16,12 @@ interface MainPageProps {
 
 export default function MainPage({ startDate, nextMilestoneDate, images }: MainPageProps) {
   return (
-    <div className="container mx-auto px-4 py-8 relative z-10 animate-fade-in-up text-white">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="container mx-auto px-4 py-8 relative z-10 text-white"
+    >
       <LoveHeader />
 
       <main className="max-w-5xl mx-auto space-y-16">
@@ -25,8 +32,18 @@ export default function MainPage({ startDate, nextMilestoneDate, images }: MainP
       </main>
 
       <footer className="text-center mt-16 pb-8 text-white/80">
-        <p>Made with <i className="fas fa-heart text-red-500 animate-pulse"></i> for Thu Hà</p>
+        <p>Made with <motion.i 
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ repeat: Infinity, duration: 1 }}
+          className="fas fa-heart text-red-500 inline-block mx-1"
+        ></motion.i> for Thu Hà</p>
+        <button 
+          onClick={() => logout()} 
+          className="mt-4 text-xs text-white/50 hover:text-white transition-colors"
+        >
+          Logout
+        </button>
       </footer>
-    </div>
+    </motion.div>
   );
 }
