@@ -35,12 +35,17 @@ export default function MusicPlayer() {
   };
 
   return (
-    <div className="music-player">
+    <div className="fixed bottom-24 right-6 md:bottom-28 md:right-8 z-50">
       <button 
         onClick={toggleMusic}
-        className={`glass-card w-12 h-12 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300 ${isPlaying ? 'playing' : ''}`}
+        className={`glass-card w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 shadow-xl border-2 ${
+          isPlaying 
+            ? 'bg-gradient-to-br from-pink-500 to-pink-600 border-white/30 shadow-pink-500/50' 
+            : 'bg-white/10 border-white/20 shadow-black/20'
+        } ${isPlaying ? 'playing' : ''}`}
+        aria-label={isPlaying ? "Pause Music" : "Play Music"}
       >
-        <i className={`fas fa-music text-xl music-disc ${isPlaying ? 'text-pink-600' : 'text-gray-400'}`}></i>
+        <i className={`fas fa-music text-xl md:text-2xl music-disc ${isPlaying ? 'text-white' : 'text-gray-400'}`}></i>
       </button>
       {audioSrc && (
         <audio ref={audioRef} id="bgMusic" loop>

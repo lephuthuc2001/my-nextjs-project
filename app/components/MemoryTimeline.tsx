@@ -77,137 +77,170 @@ export default function MemoryTimeline() {
   };
 
   return (
-    <section className="space-y-12">
+    <section className="space-y-8 pb-8">
       <div className="text-center mb-8">
-        <h2 className="text-4xl md:text-5xl text-white drop-shadow-md mb-2 script-font">Our Journey</h2>
-        <div className="h-1 w-24 bg-white mx-auto rounded-full opacity-50 mb-4"></div>
-
+        <h2 className="text-4xl md:text-5xl text-white drop-shadow-md mb-3 script-font">Our Journey</h2>
+        <div className="h-1 w-24 bg-white mx-auto rounded-full opacity-50"></div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {Object.keys(groupedMemories).sort((a, b) => Number(b) - Number(a)).map(year => (
-          <div key={year} className="mb-16">
+          <div key={year} className="mb-12">
             {/* Year Header */}
-            <motion.h3 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              className="text-7xl font-bold text-white/20 mb-8 border-b border-white/10 pb-4 select-none"
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-4 mb-8"
             >
-              {year}
-            </motion.h3>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/20"></div>
+              <h3 className="text-3xl md:text-4xl font-bold text-white/90 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                {year}
+              </h3>
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/20"></div>
+            </motion.div>
 
-            <div className="space-y-10 sm:space-y-12 pl-2 md:pl-4">
+            <div className="space-y-6">
               {Object.keys(groupedMemories[year]).map(month => (
-                <div key={month} className="relative">
-                  {/* Month Header - Now clearly visible in flow */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-3 h-3 bg-pink-500 rounded-full shadow-lg shadow-pink-500/50"></div>
-                    <span className="text-2xl font-bold text-pink-200 capitalize tracking-wide drop-shadow-md">{month}</span>
-                    <div className="h-[1px] flex-1 bg-gradient-to-r from-pink-500/30 to-transparent"></div>
+                <div key={month}>
+                  {/* Month Header */}
+                  <div className="flex items-center gap-3 mb-4 ml-2">
+                    <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                    <span className="text-lg font-semibold text-pink-200 capitalize">{month}</span>
                   </div>
 
-                  <div className="space-y-4 pl-4 border-l-2 border-white/10 ml-1.5 md:ml-1.5">
+                  {/* Memory Cards */}
+                  <div className="space-y-4">
                     {groupedMemories[year][month].map((memory) => (
                       <motion.div
                         layout
                         key={memory.id}
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         onClick={(e) => toggleExpand(memory.id, e)}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className={`group cursor-pointer glass-card bg-black/60 hover:bg-black/70 border border-white/20 rounded-2xl overflow-hidden shadow-xl ${
-                          expandedId === memory.id ? 'ring-2 ring-pink-500/50 bg-black/80' : ''
+                        className={`group cursor-pointer bg-white/95 backdrop-blur-md rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border-2 ${
+                          expandedId === memory.id ? 'border-pink-400 shadow-pink-500/30' : 'border-white/50'
                         }`}
                       >
-                        {/* Compact Row */}
-                        <div className="flex items-start sm:items-center p-4 sm:p-4 gap-4 sm:gap-5 transition-all duration-200">
-                          {/* Day Badge */}
-                          <div className="flex flex-col items-center justify-center bg-white/10 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl border border-white/20 shadow-inner shrink-0 backdrop-blur-md">
-                            <span className="text-xl sm:text-2xl font-bold drop-shadow-sm leading-none">{new Date(memory.date).getDate()}</span>
-                            <span className="text-[8px] sm:text-[10px] uppercase text-white/80 font-bold tracking-wider mt-0.5 sm:mt-1">
-                              {new Date(memory.date).toLocaleString('default', { weekday: 'short' })}
-                            </span>
-                          </div>
+                        {/* Card Header with Image */}
+                        {memory.imageUrls && memory.imageUrls.length > 0 ? (
+                          <div className="relative h-48 md:h-56 overflow-hidden bg-gradient-to-br from-pink-100 to-purple-100">
+                            <img 
+                              src={memory.imageUrls[0]} 
+                              alt={memory.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                            
+                            {/* Date Badge on Image */}
+                            <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg border border-white/50">
+                              <div className="text-center">
+                                <div className="text-3xl font-bold text-pink-600 leading-none">{new Date(memory.date).getDate()}</div>
+                                <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mt-1">
+                                  {new Date(memory.date).toLocaleString('default', { month: 'short' })}
+                                </div>
+                              </div>
+                            </div>
 
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-white text-xl group-hover:text-pink-300 transition-colors duration-200 drop-shadow-md truncate">
-                              {memory.title}
-                            </h4>
-                            <div className="flex flex-wrap items-center text-sm text-white/80 gap-x-4 gap-y-1 mt-1.5">
-                              {memory.location && (
-                                <span className="flex items-center truncate max-w-[200px]">
-                                  <i className="fas fa-map-marker-alt mr-1.5 text-pink-400"></i> {memory.location}
-                                </span>
-                              )}
-                              {memory.cost && memory.cost > 0 && (
-                                <span className="flex items-center text-green-300 font-bold tracking-wide bg-green-900/30 px-2 py-0.5 rounded-md border border-green-500/30">
-                                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(memory.cost)}
-                                </span>
-                              )}
+                            {/* Title on Image */}
+                            <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                              <h4 className="text-xl md:text-2xl font-bold drop-shadow-lg line-clamp-2">
+                                {memory.title}
+                              </h4>
                             </div>
                           </div>
+                        ) : (
+                          // No Image Layout
+                          <div className="relative bg-gradient-to-br from-pink-50 to-purple-50 p-6">
+                            <div className="flex items-start gap-4">
+                              <div className="bg-white rounded-2xl px-4 py-3 shadow-md border border-pink-200">
+                                <div className="text-center">
+                                  <div className="text-3xl font-bold text-pink-600 leading-none">{new Date(memory.date).getDate()}</div>
+                                  <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mt-1">
+                                    {new Date(memory.date).toLocaleString('default', { month: 'short' })}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="text-xl md:text-2xl font-bold text-gray-800 line-clamp-2">
+                                  {memory.title}
+                                </h4>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
-                          {/* Thumbnail / Expand Icon */}
-                          <div className="shrink-0 ml-auto pt-1 sm:pt-0">
-                            {memory.imageUrls && memory.imageUrls.length > 0 ? (
-                              <img 
-                                src={memory.imageUrls[0]} 
-                                alt="thumb" 
-                                className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl object-cover border border-white/30 shadow-lg group-hover:scale-105 transition-transform duration-200"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center text-white/40 border border-white/10 group-hover:bg-white/10 transition-colors">
-                                <i className={`fas ${expandedId === memory.id ? 'fa-align-left' : 'fa-list'} text-base sm:text-lg`}></i>
+                        {/* Card Content */}
+                        <div className="p-5 bg-white">
+                          {/* Metadata */}
+                          <div className="flex flex-wrap items-center gap-3 text-sm">
+                            {memory.location && (
+                              <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full">
+                                <i className="fas fa-map-marker-alt text-pink-500"></i>
+                                <span className="font-medium">{memory.location}</span>
                               </div>
                             )}
-                          </div>
-                        </div>
-
-                        {/* Expanded Content */}
-                        <AnimatePresence>
-                        {expandedId === memory.id && (
-                          <motion.div 
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.2, ease: "easeOut" }}
-                            className="border-t border-white/10 bg-black/40"
-                          >
-                            <div className="p-6 space-y-6">
-                              {memory.description && (
-                                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                                  <p className="text-white text-base leading-relaxed whitespace-pre-wrap font-light italic">
-                                    "{memory.description}"
-                                  </p>
-                                </div>
-                              )}
-                              
-                              {/* Gallery Grid */}
-                              {memory.imageUrls && memory.imageUrls.length > 0 && (
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                  {memory.imageUrls.map((url, i) => (
-                                    <div key={i} className="aspect-square rounded-xl overflow-hidden border border-white/20 relative group/img shadow-md cursor-zoom-in">
-                                      <img src={url} alt={`memory-${i}`} className="w-full h-full object-cover transition-transform duration-200 group-hover/img:scale-105" />
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-
-                              {/* Action Buttons */}
-                              <div className="flex justify-end pt-2">
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); setEditingMemory(memory); }}
-                                  className="text-white hover:text-pink-100 text-sm flex items-center gap-2 px-6 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 transition-all shadow-lg shadow-pink-600/30 active:scale-95 duration-100 font-medium"
-                                >
-                                  <i className="fas fa-edit"></i> Edit Memory
-                                </button>
+                            {memory.cost && memory.cost > 0 && (
+                              <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-3 py-1.5 rounded-full border border-green-200">
+                                <i className="fas fa-coins text-green-600"></i>
+                                <span className="font-bold">
+                                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(memory.cost)}
+                                </span>
                               </div>
-                            </div>
-                          </motion.div>
-                        )}
-                        </AnimatePresence>
+                            )}
+                            <button className="ml-auto text-pink-500 hover:text-pink-600 transition-colors">
+                              <i className={`fas ${expandedId === memory.id ? 'fa-chevron-up' : 'fa-chevron-down'} text-lg`}></i>
+                            </button>
+                          </div>
+
+                          {/* Expanded Content */}
+                          <AnimatePresence>
+                            {expandedId === memory.id && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pt-5 space-y-4 border-t border-gray-100 mt-4">
+                                  {memory.description && (
+                                    <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-4 rounded-2xl border border-pink-100">
+                                      <p className="text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap italic">
+                                        "{memory.description}"
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {/* Image Gallery */}
+                                  {memory.imageUrls && memory.imageUrls.length > 1 && (
+                                    <div>
+                                      <h5 className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">Gallery</h5>
+                                      <div className="grid grid-cols-3 gap-2">
+                                        {memory.imageUrls.slice(1).map((url, i) => (
+                                          <div key={i} className="aspect-square rounded-xl overflow-hidden border-2 border-white shadow-md hover:shadow-lg transition-shadow">
+                                            <img src={url} alt={`${memory.title} ${i + 2}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" />
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Edit Button */}
+                                  <div className="flex justify-end pt-2">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); setEditingMemory(memory); }}
+                                      className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 font-medium text-sm"
+                                    >
+                                      <i className="fas fa-edit"></i>
+                                      <span>Edit Memory</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
                       </motion.div>
                     ))}
                   </div>
@@ -216,29 +249,25 @@ export default function MemoryTimeline() {
             </div>
           </div>
         ))}
+
         {isLoading ? (
-          <div className="space-y-8">
-            {[1, 2].map((i) => (
-              <div key={i} className="space-y-4">
-                <Skeleton className="h-16 w-32 bg-white/10" />
-                <div className="space-y-4 pl-4 border-l-2 border-white/10">
-                  {[1, 2, 3].map((j) => (
-                    <div key={j} className="flex items-center gap-4 p-4 glass-card bg-black/40 rounded-2xl">
-                      <Skeleton className="w-14 h-14 rounded-2xl bg-white/10" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-6 w-1/2 bg-white/10" />
-                        <Skeleton className="h-4 w-1/4 bg-white/10" />
-                      </div>
-                      <Skeleton className="w-14 h-14 rounded-xl bg-white/10" />
-                    </div>
-                  ))}
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white/80 rounded-3xl overflow-hidden">
+                <Skeleton className="h-48 w-full bg-gray-200" />
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-6 w-3/4 bg-gray-200" />
+                  <Skeleton className="h-4 w-1/2 bg-gray-200" />
                 </div>
               </div>
             ))}
           </div>
         ) : memories.length === 0 ? (
-          <div className="text-center text-white/50 py-12 italic">
-            Ready to start your journey? Add your first memory!
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-4">
+              <i className="fas fa-heart text-3xl text-white/60"></i>
+            </div>
+            <p className="text-white/70 text-lg italic">Ready to start your journey? Add your first memory!</p>
           </div>
         ) : null}
       </div>

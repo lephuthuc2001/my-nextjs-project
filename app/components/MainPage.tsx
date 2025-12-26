@@ -27,11 +27,11 @@ export default function MainPage({ startDate, nextMilestoneDate, images }: MainP
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10 text-white"
+      className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-32 md:pb-24 relative z-10 text-white"
     >
       <LoveHeader />
 
-      <main className="max-w-5xl mx-auto space-y-20 md:space-y-24">
+      <main className="max-w-5xl mx-auto space-y-16 md:space-y-20">
         <TimeCounters startDate={startDate} />
         <MemoriesGallery images={images} />
         <MemoryTimeline />
@@ -45,9 +45,10 @@ export default function MainPage({ startDate, nextMilestoneDate, images }: MainP
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setShowAddMemory(true)}
-        className="fixed bottom-24 right-6 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg z-50 flex items-center justify-center border-2 border-white/50"
+        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl shadow-pink-500/50 z-40 flex items-center justify-center border-2 border-white/30 backdrop-blur-sm transition-all duration-300"
+        aria-label="Add Memory"
       >
-        <i className="fas fa-plus text-xl"></i>
+        <i className="fas fa-plus text-xl md:text-2xl"></i>
       </motion.button>
 
       {/* Add Memory Modal */}

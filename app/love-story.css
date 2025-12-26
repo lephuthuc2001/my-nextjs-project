@@ -68,13 +68,7 @@ h1, h2, .script-font {
 }
 .animate-shake { animation: shake 0.3s ease-in-out; }
 
-/* Music Player */
-.music-player {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 50;
-}
+/* Music Player Animation */
 .music-disc {
     animation: spin 4s linear infinite;
     animation-play-state: paused;
