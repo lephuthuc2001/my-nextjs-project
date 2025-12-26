@@ -222,14 +222,11 @@ export default function MemoryTimeline() {
       </div>
 
       {/* Edit Memory Modal */}
-      {editingMemory && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <AddMemoryForm 
-            initialData={editingMemory} 
-            onClose={() => setEditingMemory(null)} 
-          />
-        </div>
-      )}
+      <AddMemoryForm 
+        open={!!editingMemory}
+        onOpenChange={(open) => !open && setEditingMemory(null)}
+        initialData={editingMemory}
+      />
     </section>
   );
 }

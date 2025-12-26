@@ -51,11 +51,10 @@ export default function MainPage({ startDate, nextMilestoneDate, images }: MainP
       </motion.button>
 
       {/* Add Memory Modal */}
-      {showAddMemory && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <AddMemoryForm onClose={() => setShowAddMemory(false)} />
-        </div>
-      )}
+      <AddMemoryForm 
+        open={showAddMemory} 
+        onOpenChange={setShowAddMemory}
+      />
 
       <footer className="text-center mt-16 pb-8 text-white/80">
         <p>Made with <motion.i 

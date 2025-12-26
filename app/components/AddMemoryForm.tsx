@@ -1,14 +1,18 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import { uploadData } from 'aws-amplify/storage';
 import { type Schema } from '@/amplify/data/resource';
-import { motion } from 'motion/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 const client = generateClient<Schema>();
 
@@ -23,37 +27,54 @@ const memorySchema = z.object({
 type MemoryFormValues = z.infer<typeof memorySchema>;
 
 interface AddMemoryFormProps {
-  onClose: () => void;
-  initialData?: any; // We can type this properly later or import the type
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  initialData?: any; 
 }
 
-export default function AddMemoryForm({ onClose, initialData }: AddMemoryFormProps) {
+export default function AddMemoryForm({ open, onOpenChange, initialData }: AddMemoryFormProps) {
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>(initialData?.images || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Helper to get previews (this is naive, real app might want better preview mgmt)
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<MemoryFormValues>({
     resolver: zodResolver(memorySchema),
-    defaultValues: initialData ? {
-      title: initialData.title,
-      description: initialData.description,
-      date: initialData.date,
-      cost: initialData.cost,
-      location: initialData.location,
-    } : {
+    defaultValues: {
       cost: 0,
+      title: '',
+      date: '',
+      description: '',
+      location: ''
     }
   });
+
+  useEffect(() => {
+    if (open) {
+      reset(initialData ? {
+        title: initialData.title,
+        description: initialData.description,
+        date: initialData.date,
+        cost: initialData.cost,
+        location: initialData.location,
+      } : {
+        title: '',
+        date: '',
+        description: '',
+        cost: 0,
+        location: '',
+      });
+      setExistingImages(initialData?.images || []); 
+      setNewFiles([]);
+      setFilePreviews([]);
+    }
+  }, [open, initialData, reset]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setNewFiles(prev => [...prev, ...files]);
       
-      // Generate previews
       const newPreviews = files.map(file => URL.createObjectURL(file));
       setFilePreviews(prev => [...prev, ...newPreviews]);
     }
@@ -74,7 +95,6 @@ export default function AddMemoryForm({ onClose, initialData }: AddMemoryFormPro
     try {
       let imagePaths: string[] = [...existingImages];
 
-      // 1. Upload new images to S3
       for (const file of newFiles) {
         const path = `media/memories/${Date.now()}-${file.name}`;
         await uploadData({
@@ -84,7 +104,6 @@ export default function AddMemoryForm({ onClose, initialData }: AddMemoryFormPro
         imagePaths.push(path);
       }
 
-      // 2. Create or Update database entry
       if (initialData) {
          await client.models.Memory.update({
           id: initialData.id,
@@ -109,7 +128,8 @@ export default function AddMemoryForm({ onClose, initialData }: AddMemoryFormPro
       console.log('Memory saved successfully!');
       reset();
       setNewFiles([]);
-      onClose();
+      setFilePreviews([]);
+      onOpenChange(false);
       window.location.reload(); 
     } catch (error) {
       console.error('Error saving memory:', error);
@@ -118,177 +138,151 @@ export default function AddMemoryForm({ onClose, initialData }: AddMemoryFormPro
     }
   };
 
-  // ... (render) but replace file input section
-  // ...
-  
-  // Note: For existing images, we typically have paths, not full URLs. 
-  // We assume specific component or separate logic handles displaying existing image PATHS as URLs.
-  // BUT for a simple form, we might not see existing images unless we fetch URLs.
-  // For now, let's just list "Existing Image 1, 2..." or try to show if possible, but fetching URLs async is complex here.
-  // Actually MemoryTimeline passes `initialData` which might have `imageUrls` if we typed it as `MemoryWithUrls`.
-  // Let's check `MemoryTimeline`. Yes, it passes `editingMemory`.
-  // `editingMemory` has `imageUrls`.
-
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="glass-card p-6 rounded-2xl w-full max-w-lg mx-auto bg-white/10 backdrop-blur-md border border-white/20 max-h-[90vh] overflow-y-auto"
-    >
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-white">{initialData ? 'Edit Memory ✏️' : 'Add New Memory ✨'}</h2>
-        <button onClick={onClose} className="text-white/50 hover:text-white">
-          <i className="fas fa-times text-xl"></i>
-        </button>
-      </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="glass-card bg-black/80 backdrop-blur-xl border-white/10 text-white sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-white">
+            {initialData ? 'Edit Memory ✏️' : 'Add New Memory ✨'}
+          </DialogTitle>
+        </DialogHeader>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <div>
-          <label className="block text-white/80 text-sm mb-1 font-medium">Title</label>
-          <input 
-            {...register('title')}
-            className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
-            placeholder="e.g. Dinner at..."
-          />
-          {errors.title && <p className="text-red-300 text-xs mt-1">{errors.title.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-white/80 text-sm mb-1 font-medium">Date</label>
-          <input 
-            type="date" 
-            {...register('date')}
-            className="w-full p-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
-          />
-          {errors.date && <p className="text-red-300 text-xs mt-1">{errors.date.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-white/80 text-sm mb-1 font-medium">Description</label>
-          <textarea 
-            {...register('description')}
-            className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all h-24 resize-none"
-            placeholder="How did it feel...?"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-4">
           <div>
-            <label className="block text-white/80 text-sm mb-1 font-medium">Cost (VND)</label>
-            <div className="relative">
+            <label className="block text-white/80 text-sm mb-1 font-medium">Title</label>
+            <input 
+              {...register('title')}
+              className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
+              placeholder="e.g. Dinner at..."
+            />
+            {errors.title && <p className="text-red-300 text-xs mt-1">{errors.title.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-white/80 text-sm mb-1 font-medium">Date</label>
+            <input 
+              type="date" 
+              {...register('date')}
+              className="w-full p-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
+            />
+            {errors.date && <p className="text-red-300 text-xs mt-1">{errors.date.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-white/80 text-sm mb-1 font-medium">Description</label>
+            <textarea 
+              {...register('description')}
+              className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all h-24 resize-none"
+              placeholder="How did it feel...?"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-white/80 text-sm mb-1 font-medium">Cost (VND)</label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  step="1000"
+                  {...register('cost', { valueAsNumber: true })}
+                  className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all pl-8"
+                  placeholder="0"
+                />
+                <span className="absolute left-3 top-3 text-white/50 text-xs">₫</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-white/80 text-sm mb-1 font-medium">Location(s)</label>
               <input 
-                type="number" 
-                step="1000"
-                {...register('cost', { valueAsNumber: true })}
-                className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all pl-8"
-                placeholder="0"
+                {...register('location')}
+                className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
+                placeholder="Place A, Place B..."
               />
-              <span className="absolute left-3 top-3 text-white/50 text-xs">₫</span>
+              <p className="text-[10px] text-white/40 mt-1">Separate multiple places with commas</p>
             </div>
           </div>
-          <div>
-            <label className="block text-white/80 text-sm mb-1 font-medium">Location(s)</label>
-            <input 
-              {...register('location')}
-              className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
-              placeholder="Place A, Place B..."
-            />
-            <p className="text-[10px] text-white/40 mt-1">Separate multiple places with commas</p>
-          </div>
-        </div>
 
-        <div>
-          <label className="block text-white/80 text-sm mb-2 font-medium">Photos</label>
-          
-          {/* Recent/Existing Files Grid */}
-          {(existingImages.length > 0 || filePreviews.length > 0) && (
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              {/* Existing Images (if we have URLs passed in initialData, we use them, else we might show placeholders) */}
-              {/* Assumption: initialData has imageUrls populated by MemoryTimeline */}
-              {initialData?.imageUrls && existingImages.map((path, i) => {
-                 // Try to find the matching URL in initialData.imageUrls based on index or just use index mapping if consistent
-                 // A stronger way is to just use initialData.imageUrls[i] if valid. 
-                 // But wait, existingImages state tracks paths. If we remove a path, we need to remove the URL too?
-                 // Let's rely on the fact that existingImages tracks 'paths'.
-                 // Visually, we need URLs. 
-                 // Let's use initialData.imageUrls filtering.
-                 return (
-                  <div key={`exist-${i}`} className="relative aspect-square rounded-lg overflow-hidden group">
-                     {/* We try to use the URL if available. This is a bit tricky if they don't map 1:1 after edits. 
-                         For simplicity: just show "Stored Image" icon if URL missing, or try index.
-                     */}
-                    <div className="w-full h-full bg-white/10 flex items-center justify-center text-xs text-white/50">
-                       <i className="fas fa-image text-2xl"></i>
-                    </div> 
-                    {/* Ideally we would show the image. Let's try to grab it from initialData.imageUrls[i] */}
-                     {initialData.imageUrls && initialData.imageUrls[i] && (
-                        <img src={initialData.imageUrls[i]} alt="existing" className="absolute inset-0 w-full h-full object-cover" />
-                     )}
+          <div>
+            <label className="block text-white/80 text-sm mb-2 font-medium">Photos</label>
+            
+            {/* Recent/Existing Files Grid */}
+            {(existingImages.length > 0 || filePreviews.length > 0) && (
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {initialData?.imageUrls && existingImages.map((path, i) => {
+                   return (
+                    <div key={`exist-${i}`} className="relative aspect-square rounded-lg overflow-hidden group border border-white/10">
+                      <div className="w-full h-full bg-white/5 flex items-center justify-center text-xs text-white/50">
+                         <i className="fas fa-image text-2xl"></i>
+                      </div> 
+                       {initialData.imageUrls && initialData.imageUrls[i] && (
+                          <img src={initialData.imageUrls[i]} alt="existing" className="absolute inset-0 w-full h-full object-cover" />
+                       )}
+                      <button 
+                        type="button"
+                        onClick={() => removeExisting(i)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </div>
+                   )
+                })}
+
+                {filePreviews.map((src, i) => (
+                  <div key={`new-${i}`} className="relative aspect-square rounded-lg overflow-hidden group border border-white/10">
+                    <img src={src} alt="preview" className="w-full h-full object-cover" />
                     <button 
                       type="button"
-                      onClick={() => removeExisting(i)}
+                      onClick={() => removeFile(i)}
                       className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <i className="fas fa-times"></i>
                     </button>
                   </div>
-                 )
-              })}
+                ))}
+              </div>
+            )}
 
-              {filePreviews.map((src, i) => (
-                <div key={`new-${i}`} className="relative aspect-square rounded-lg overflow-hidden group">
-                  <img src={src} alt="preview" className="w-full h-full object-cover" />
-                  <button 
-                    type="button"
-                    onClick={() => removeFile(i)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+            <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-white/20 border-dashed rounded-xl cursor-pointer hover:bg-white/5 transition-colors">
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <i className="fas fa-cloud-upload-alt text-2xl text-pink-300 mb-2"></i>
+                <p className="text-sm text-white/70">
+                  <span className="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-white/50">{newFiles.length} new files selected</p>
+              </div>
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*"
+                className="hidden" 
+                onChange={handleFileChange}
+              />
+            </label>
+          </div>
 
-          <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-white/20 border-dashed rounded-xl cursor-pointer hover:bg-white/5 transition-colors">
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              <i className="fas fa-cloud-upload-alt text-2xl text-pink-300 mb-2"></i>
-              <p className="text-sm text-white/70">
-                <span className="font-semibold">Click to upload</span> or drag and drop
-              </p>
-              <p className="text-xs text-white/50">{newFiles.length} new files selected</p>
-            </div>
-            <input 
-              type="file" 
-              multiple 
-              accept="image/*"
-              className="hidden" 
-              onChange={handleFileChange}
-            />
-          </label>
-        </div>
-
-        <div className="flex gap-3 pt-4">
-          <button 
-            type="button" 
-            onClick={onClose}
-            className="flex-1 py-3 px-4 rounded-xl bg-white/5 text-white hover:bg-white/10 transition-colors font-medium"
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold shadow-lg hover:shadow-pink-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center">
-                <i className="fas fa-spinner fa-spin mr-2"></i> Saving...
-              </span>
-            ) : 'Save Memory'}
-          </button>
-        </div>
-      </form>
-    </motion.div>
+          <div className="flex gap-3 pt-4">
+            <button 
+              type="button" 
+              onClick={() => onOpenChange(false)}
+              className="flex-1 py-3 px-4 rounded-xl bg-white/5 text-white hover:bg-white/10 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold shadow-lg hover:shadow-pink-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <i className="fas fa-spinner fa-spin mr-2"></i> Saving...
+                </span>
+              ) : 'Save Memory'}
+            </button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
