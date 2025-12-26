@@ -18,35 +18,43 @@ export default function BucketList() {
 
   // Subscribe to real-time updates
   useEffect(() => {
-    if (!client.models.BucketItem) {
-      console.warn("BucketItem model not found. Ensure Amplify sandbox is running and schema is deployed.");
+    // Defensive check to see if the model exists in the current client configuration
+    const bucketModel = (client.models as any)?.BucketItem;
+    
+    if (!bucketModel) {
+      console.warn("BucketItem model not found in the current Amplify configuration. Please run 'npx ampx sandbox' to sync your backend.");
       setIsLoading(false);
       return;
     }
 
-    const sub = client.models.BucketItem.observeQuery().subscribe({
-      next: ({ items }) => {
-        // Sort items by createdAt descending
-        const sortedItems = [...items].sort((a, b) => {
-          const dateA = new Date(a.createdAt || 0).getTime();
-          const dateB = new Date(b.createdAt || 0).getTime();
-          return dateB - dateA;
-        });
-        setItems(sortedItems);
-        setIsLoading(false);
-      },
-      error: (error) => {
-        console.error('Error fetching bucket items:', error);
-        setIsLoading(false);
-      },
-    });
+    try {
+      const sub = bucketModel.observeQuery().subscribe({
+        next: ({ items }: { items: BucketItem[] }) => {
+          const sortedItems = [...items].sort((a, b) => {
+            const dateA = new Date(a.createdAt || 0).getTime();
+            const dateB = new Date(b.createdAt || 0).getTime();
+            return dateB - dateA;
+          });
+          setItems(sortedItems);
+          setIsLoading(false);
+        },
+        error: (error: any) => {
+          console.error('Error fetching bucket items:', error);
+          setIsLoading(false);
+        },
+      });
 
-    return () => sub.unsubscribe();
+      return () => sub.unsubscribe();
+    } catch (e) {
+      console.error("Failed to initialize BucketItem subscription:", e);
+      setIsLoading(false);
+    }
   }, []);
 
   const addItem = async () => {
     if (newItem.trim()) {
-      if (!client.models.BucketItem) {
+      const bucketModel = (client.models as any)?.BucketItem;
+      if (!bucketModel) {
         console.error("Cannot add item: BucketItem model not found.");
         return;
       }
@@ -55,7 +63,7 @@ export default function BucketList() {
       setIsAdding(false);
       
       try {
-        await client.models.BucketItem.create({
+        await bucketModel.create({
           text,
           completed: false,
           createdAt: new Date().toISOString(),
@@ -67,9 +75,10 @@ export default function BucketList() {
   };
 
   const toggleComplete = async (item: BucketItem) => {
-    if (!client.models.BucketItem) return;
+    const bucketModel = (client.models as any)?.BucketItem;
+    if (!bucketModel) return;
     try {
-      await client.models.BucketItem.update({
+      await bucketModel.update({
         id: item.id,
         completed: !item.completed,
       });
@@ -79,9 +88,10 @@ export default function BucketList() {
   };
 
   const deleteItem = async (id: string) => {
-    if (!client.models.BucketItem) return;
+    const bucketModel = (client.models as any)?.BucketItem;
+    if (!bucketModel) return;
     try {
-      await client.models.BucketItem.delete({ id });
+      await bucketModel.delete({ id });
     } catch (error) {
       console.error('Failed to delete item', error);
     }
