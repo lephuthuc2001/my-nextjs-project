@@ -53,8 +53,9 @@ export default function AddMemoryForm({ open, onOpenChange, initialData }: AddMe
   const [existingImages, setExistingImages] = useState<string[]>(initialData?.images || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
+  const [displayCost, setDisplayCost] = useState('');
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<MemoryFormValues>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<MemoryFormValues>({
     resolver: zodResolver(memorySchema),
     defaultValues: {
       cost: 0,
@@ -83,8 +84,32 @@ export default function AddMemoryForm({ open, onOpenChange, initialData }: AddMe
       setExistingImages(initialData?.images || []); 
       setNewFiles([]);
       setFilePreviews([]);
+      
+      // Initialize display cost
+      if (initialData?.cost) {
+        setDisplayCost(new Intl.NumberFormat('vi-VN').format(initialData.cost));
+      } else {
+        setDisplayCost('0');
+      }
     }
   }, [open, initialData, reset]);
+
+  const formatVND = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '');
+    if (!digits) return '';
+    return new Intl.NumberFormat('vi-VN').format(parseInt(digits));
+  };
+
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const formatted = formatVND(rawValue);
+    setDisplayCost(formatted);
+    
+    // Update form value as number
+    const numericValue = parseInt(rawValue.replace(/\D/g, '')) || 0;
+    setValue('cost', numericValue);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -216,9 +241,9 @@ export default function AddMemoryForm({ open, onOpenChange, initialData }: AddMe
               <div className="relative">
                 <Input 
                   id="cost"
-                  type="number" 
-                  step="1000"
-                  {...register('cost', { valueAsNumber: true })}
+                  type="text" 
+                  value={displayCost}
+                  onChange={handleCostChange}
                   className="bg-white/10 text-white placeholder:text-white/30 border-white/20 focus:ring-pink-400/50 pl-8"
                   placeholder="0"
                 />

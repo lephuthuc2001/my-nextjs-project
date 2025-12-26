@@ -14,7 +14,6 @@ type MemoryWithUrls = Schema['Memory']['type'] & { imageUrls?: string[] };
 
 export default function MemoryTimeline() {
   const [memories, setMemories] = useState<MemoryWithUrls[]>([]);
-  const [totalCost, setTotalCost] = useState(0);
   const [editingMemory, setEditingMemory] = useState<MemoryWithUrls | null>(null);
 
   useEffect(() => {
@@ -23,10 +22,6 @@ export default function MemoryTimeline() {
         // Sort by date descending (newest first)
         const sortedItems = items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         
-        // Calculate total cost
-        const cost = sortedItems.reduce((acc, item) => acc + (item.cost || 0), 0);
-        setTotalCost(cost);
-
         // Fetch image URLs for each memory
         const itemsWithUrls = await Promise.all(
           sortedItems.map(async (item) => {
@@ -79,7 +74,7 @@ export default function MemoryTimeline() {
       <div className="text-center mb-8">
         <h2 className="text-4xl md:text-5xl text-white drop-shadow-md mb-2 script-font">Our Journey</h2>
         <div className="h-1 w-24 bg-white mx-auto rounded-full opacity-50 mb-4"></div>
-        <p className="text-pink-100 italic">Total invested in love: <span className="font-bold">${totalCost.toFixed(2)}</span></p>
+
       </div>
 
       <div className="max-w-3xl mx-auto px-4">
@@ -119,11 +114,11 @@ export default function MemoryTimeline() {
                         }`}
                       >
                         {/* Compact Row */}
-                        <div className="flex items-center p-4 gap-5 transition-all duration-200">
+                        <div className="flex items-start sm:items-center p-3 sm:p-4 gap-3 sm:gap-5 transition-all duration-200">
                           {/* Day Badge */}
-                          <div className="flex flex-col items-center justify-center bg-white/10 text-white w-14 h-14 rounded-2xl border border-white/20 shadow-inner shrink-0 backdrop-blur-md">
-                            <span className="text-2xl font-bold drop-shadow-sm leading-none">{new Date(memory.date).getDate()}</span>
-                            <span className="text-[10px] uppercase text-white/80 font-bold tracking-wider mt-1">
+                          <div className="flex flex-col items-center justify-center bg-white/10 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl border border-white/20 shadow-inner shrink-0 backdrop-blur-md">
+                            <span className="text-xl sm:text-2xl font-bold drop-shadow-sm leading-none">{new Date(memory.date).getDate()}</span>
+                            <span className="text-[8px] sm:text-[10px] uppercase text-white/80 font-bold tracking-wider mt-0.5 sm:mt-1">
                               {new Date(memory.date).toLocaleString('default', { weekday: 'short' })}
                             </span>
                           </div>
@@ -141,23 +136,23 @@ export default function MemoryTimeline() {
                               )}
                               {memory.cost && memory.cost > 0 && (
                                 <span className="flex items-center text-green-300 font-bold tracking-wide bg-green-900/30 px-2 py-0.5 rounded-md border border-green-500/30">
-                                  <i className="fas fa-dollar-sign mr-1 text-xs"></i> {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(memory.cost)}
+                                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(memory.cost)}
                                 </span>
                               )}
                             </div>
                           </div>
 
                           {/* Thumbnail / Expand Icon */}
-                          <div className="shrink-0">
+                          <div className="shrink-0 ml-auto pt-1 sm:pt-0">
                             {memory.imageUrls && memory.imageUrls.length > 0 ? (
                               <img 
                                 src={memory.imageUrls[0]} 
                                 alt="thumb" 
-                                className="w-14 h-14 rounded-xl object-cover border border-white/30 shadow-lg group-hover:scale-105 transition-transform duration-200"
+                                className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl object-cover border border-white/30 shadow-lg group-hover:scale-105 transition-transform duration-200"
                               />
                             ) : (
-                              <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center text-white/40 border border-white/10 group-hover:bg-white/10 transition-colors">
-                                <i className={`fas ${expandedId === memory.id ? 'fa-align-left' : 'fa-list'} text-lg`}></i>
+                              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center text-white/40 border border-white/10 group-hover:bg-white/10 transition-colors">
+                                <i className={`fas ${expandedId === memory.id ? 'fa-align-left' : 'fa-list'} text-base sm:text-lg`}></i>
                               </div>
                             )}
                           </div>
