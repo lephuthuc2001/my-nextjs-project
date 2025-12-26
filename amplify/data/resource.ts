@@ -12,6 +12,17 @@ const schema = a.schema({
       createdAt: a.datetime(),
     })
     .authorization((allow) => [allow.authenticated()]),
+
+  Memory: a
+    .model({
+      title: a.string().required(),
+      description: a.string(),
+      date: a.date().required(),
+      images: a.string().array(), // Stores S3 paths
+      cost: a.float(),
+      location: a.string(),
+    })
+    .authorization((allow) => [allow.authenticated()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

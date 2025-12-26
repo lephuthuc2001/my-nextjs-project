@@ -7,7 +7,10 @@ import MemoriesGallery from './MemoriesGallery';
 import BucketList from './BucketList';
 import Milestones from './Milestones';
 import SocialFollow from './SocialFollow';
+import MemoryTimeline from './MemoryTimeline';
 import { motion } from "motion/react";
+import { useState } from 'react';
+import AddMemoryForm from './AddMemoryForm';
 
 interface MainPageProps {
   startDate: Date;
@@ -17,6 +20,7 @@ interface MainPageProps {
 
 export default function MainPage({ startDate, nextMilestoneDate, images }: MainPageProps) {
   const { signOut } = useAuthenticator();
+  const [showAddMemory, setShowAddMemory] = useState(false);
 
   return (
     <motion.div 
@@ -30,10 +34,28 @@ export default function MainPage({ startDate, nextMilestoneDate, images }: MainP
       <main className="max-w-5xl mx-auto space-y-16">
         <TimeCounters startDate={startDate} />
         <MemoriesGallery images={images} />
+        <MemoryTimeline />
         <BucketList />
         <Milestones nextMilestoneDate={nextMilestoneDate} />
         <SocialFollow />
       </main>
+
+      {/* Floating Add Memory Button */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setShowAddMemory(true)}
+        className="fixed bottom-24 right-6 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg z-50 flex items-center justify-center border-2 border-white/50"
+      >
+        <i className="fas fa-plus text-xl"></i>
+      </motion.button>
+
+      {/* Add Memory Modal */}
+      {showAddMemory && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <AddMemoryForm onClose={() => setShowAddMemory(false)} />
+        </div>
+      )}
 
       <footer className="text-center mt-16 pb-8 text-white/80">
         <p>Made with <motion.i 
