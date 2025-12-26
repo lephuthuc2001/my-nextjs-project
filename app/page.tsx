@@ -28,15 +28,23 @@ export default function LoveStory() {
       ];
       
       try {
+        console.log('Attempting to fetch images from path:', imagePaths[0]);
         const urls = await Promise.all(
           imagePaths.map(async (path) => {
-            const result = await getUrl({ path });
-            return result.url.toString();
+            try {
+              const result = await getUrl({ path });
+              console.log(`Fetched URL for ${path}:`, result.url.toString());
+              return result.url.toString();
+            } catch (innerError) {
+              console.error(`Failed to get URL for ${path}`, innerError);
+              return ''; // Return empty string or placeholder on failure
+            }
           })
         );
-        setImages(urls);
+        console.log('All fetched URLs:', urls);
+        setImages(urls.filter(url => url !== ''));
       } catch (error) {
-        console.error('Error loading images from storage:', error);
+        console.error('Critical Error loading images from storage:', error);
       }
     };
 
