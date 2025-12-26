@@ -10,12 +10,12 @@ export default function SocialFollow() {
       whileInView={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className="text-center"
+      className="text-center px-4 sm:px-6"
     >
       <motion.div 
         whileHover={{ scale: 1.02, y: -5 }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        className="glass-card rounded-3xl p-4 md:p-8 max-w-2xl mx-auto overflow-hidden"
+        className="glass-card rounded-3xl p-5 sm:p-6 md:p-8 max-w-2xl mx-auto overflow-hidden"
       >
         <h3 className="text-2xl md:text-3xl font-bold text-pink-600 mb-6 drop-shadow-sm">
           <i className="fab fa-tiktok mr-2"></i> Follow Our Journey

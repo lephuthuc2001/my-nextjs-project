@@ -84,7 +84,7 @@ export default function MemoryTimeline() {
 
       </div>
 
-      <div className="max-w-3xl mx-auto px-4">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
         {Object.keys(groupedMemories).sort((a, b) => Number(b) - Number(a)).map(year => (
           <div key={year} className="mb-16">
             {/* Year Header */}
@@ -96,7 +96,7 @@ export default function MemoryTimeline() {
               {year}
             </motion.h3>
 
-            <div className="space-y-10 pl-2 md:pl-4">
+            <div className="space-y-10 sm:space-y-12 pl-2 md:pl-4">
               {Object.keys(groupedMemories[year]).map(month => (
                 <div key={month} className="relative">
                   {/* Month Header - Now clearly visible in flow */}
@@ -121,7 +121,7 @@ export default function MemoryTimeline() {
                         }`}
                       >
                         {/* Compact Row */}
-                        <div className="flex items-start sm:items-center p-3 sm:p-4 gap-3 sm:gap-5 transition-all duration-200">
+                        <div className="flex items-start sm:items-center p-4 sm:p-4 gap-4 sm:gap-5 transition-all duration-200">
                           {/* Day Badge */}
                           <div className="flex flex-col items-center justify-center bg-white/10 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl border border-white/20 shadow-inner shrink-0 backdrop-blur-md">
                             <span className="text-xl sm:text-2xl font-bold drop-shadow-sm leading-none">{new Date(memory.date).getDate()}</span>

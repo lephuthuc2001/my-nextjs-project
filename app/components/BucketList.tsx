@@ -196,8 +196,8 @@ export default function BucketList() {
         <div className="h-1 w-24 bg-white mx-auto rounded-full opacity-50"></div>
       </div>
 
-      <div className="px-4 pb-12">
-        <Card className="glass-card bg-white/95 backdrop-blur-md border-none rounded-3xl p-4 md:p-8 shadow-2xl max-w-3xl mx-auto overflow-hidden">
+      <div className="px-4 sm:px-6 pb-12 sm:pb-16">
+        <Card className="glass-card bg-white/95 backdrop-blur-md border-none rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl max-w-3xl mx-auto overflow-hidden">
         <CardContent className="p-0">
           {/* Stats */}
           <div className="mb-6 space-y-3">
@@ -233,7 +233,7 @@ export default function BucketList() {
                     onChange={(e) => setNewItem(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addItem()}
                     placeholder="Add a dream..."
-                    className="w-full sm:flex-1 h-12 rounded-xl border-pink-200 focus-visible:ring-pink-400"
+                    className="w-full sm:flex-1 h-12 rounded-xl border-2 border-pink-200 focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2 focus-visible:border-pink-400"
                     autoFocus
                   />
                   <div className="flex gap-2 w-full sm:w-auto">

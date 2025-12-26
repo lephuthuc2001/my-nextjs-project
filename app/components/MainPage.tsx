@@ -27,11 +27,11 @@ export default function MainPage({ startDate, nextMilestoneDate, images }: MainP
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="container mx-auto px-4 py-8 relative z-10 text-white"
+      className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10 text-white"
     >
       <LoveHeader />
 
-      <main className="max-w-5xl mx-auto space-y-16">
+      <main className="max-w-5xl mx-auto space-y-20 md:space-y-24">
         <TimeCounters startDate={startDate} />
         <MemoriesGallery images={images} />
         <MemoryTimeline />
