@@ -18,6 +18,12 @@ export default function BucketList() {
 
   // Subscribe to real-time updates
   useEffect(() => {
+    if (!client.models.BucketItem) {
+      console.warn("BucketItem model not found. Ensure Amplify sandbox is running and schema is deployed.");
+      setIsLoading(false);
+      return;
+    }
+
     const sub = client.models.BucketItem.observeQuery().subscribe({
       next: ({ items }) => {
         // Sort items by createdAt descending
@@ -40,6 +46,10 @@ export default function BucketList() {
 
   const addItem = async () => {
     if (newItem.trim()) {
+      if (!client.models.BucketItem) {
+        console.error("Cannot add item: BucketItem model not found.");
+        return;
+      }
       const text = newItem.trim();
       setNewItem('');
       setIsAdding(false);
@@ -57,6 +67,7 @@ export default function BucketList() {
   };
 
   const toggleComplete = async (item: BucketItem) => {
+    if (!client.models.BucketItem) return;
     try {
       await client.models.BucketItem.update({
         id: item.id,
@@ -68,6 +79,7 @@ export default function BucketList() {
   };
 
   const deleteItem = async (id: string) => {
+    if (!client.models.BucketItem) return;
     try {
       await client.models.BucketItem.delete({ id });
     } catch (error) {
