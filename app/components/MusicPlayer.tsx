@@ -1,10 +1,27 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { getUrl } from 'aws-amplify/storage';
 
 export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  const [audioSrc, setAudioSrc] = useState<string>('');
+
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        const result = await getUrl({
+          path: 'media/music/all-of-me-hook.mp3',
+        });
+        setAudioSrc(result.url.toString());
+      } catch (error) {
+        console.error('Error loading music from storage:', error);
+      }
+    };
+    fetchAudio();
+  }, []);
 
   const toggleMusic = () => {
     if (audioRef.current) {
@@ -25,9 +42,11 @@ export default function MusicPlayer() {
       >
         <i className={`fas fa-music text-xl music-disc ${isPlaying ? 'text-pink-600' : 'text-gray-400'}`}></i>
       </button>
-      <audio ref={audioRef} id="bgMusic" loop>
-        <source src="/music/all-of-me-hook.mp3" type="audio/mpeg" />
-      </audio>
+      {audioSrc && (
+        <audio ref={audioRef} id="bgMusic" loop>
+          <source src={audioSrc} type="audio/mpeg" />
+        </audio>
+      )}
     </div>
   );
 }
