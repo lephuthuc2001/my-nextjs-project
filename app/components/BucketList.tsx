@@ -188,14 +188,15 @@ export default function BucketList() {
       transition={{ duration: 0.8 }}
       className="w-full"
     >
-      <div className="text-center mb-8">
-        <h2 className="text-4xl md:text-5xl text-white drop-shadow-md mb-2">
+      <div className="text-center mb-8 px-4">
+        <h2 className="text-4xl md:text-5xl text-white drop-shadow-md mb-2 script-font">
           Our 2026 Bucket List
         </h2>
         <div className="h-1 w-24 bg-white mx-auto rounded-full opacity-50"></div>
       </div>
 
-      <Card className="glass-card bg-white/95 backdrop-blur-md border-none rounded-3xl p-6 md:p-8 shadow-2xl max-w-3xl mx-auto">
+      <div className="px-4 pb-12">
+        <Card className="glass-card bg-white/95 backdrop-blur-md border-none rounded-3xl p-4 md:p-8 shadow-2xl max-w-3xl mx-auto overflow-hidden">
         <CardContent className="p-0">
           {/* Stats */}
           <div className="mb-6 space-y-3">
@@ -224,32 +225,34 @@ export default function BucketList() {
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 className="mb-6 overflow-hidden"
               >
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     type="text"
                     value={newItem}
                     onChange={(e) => setNewItem(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addItem()}
-                    placeholder="Add a dream to achieve together..."
-                    className="flex-1 h-12 rounded-xl border-pink-200 focus-visible:ring-pink-400"
+                    placeholder="Add a dream..."
+                    className="w-full sm:flex-1 h-12 rounded-xl border-pink-200 focus-visible:ring-pink-400"
                     autoFocus
                   />
-                  <Button
-                    onClick={addItem}
-                    className="h-12 px-6 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl shadow-lg hover:shadow-pink-500/30 hover:scale-[1.05] active:scale-95 transition-all border-none"
-                  >
-                    <i className="fas fa-plus"></i>
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setIsAdding(false);
-                      setNewItem('');
-                    }}
-                    className="h-12 px-4 rounded-xl hover:bg-gray-200"
-                  >
-                    <i className="fas fa-times"></i>
-                  </Button>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button
+                      onClick={addItem}
+                      className="flex-1 sm:w-16 h-12 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl shadow-lg hover:shadow-pink-500/30 hover:scale-[1.05] active:scale-95 transition-all border-none"
+                    >
+                      <i className="fas fa-plus"></i>
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setIsAdding(false);
+                        setNewItem('');
+                      }}
+                      className="w-12 h-12 rounded-xl hover:bg-gray-200"
+                    >
+                      <i className="fas fa-times"></i>
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             ) : (
@@ -305,25 +308,27 @@ export default function BucketList() {
                     animate="show"
                     exit="exit"
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className={`group flex items-center gap-3 p-4 rounded-xl border-2 transition-colors duration-200 ${
+                    className={`group flex items-start sm:items-center gap-3 p-3 sm:p-4 rounded-xl border-2 transition-colors duration-200 ${
                       item.completed
                         ? 'bg-green-50 border-green-200'
                         : 'bg-white border-gray-200 hover:border-pink-200 hover:shadow-md'
                     }`}
                   >
-                    <Checkbox 
-                      checked={!!item.completed}
-                      onCheckedChange={() => toggleComplete(item)}
-                      className={cn(
-                        "peer h-6 w-6 shrink-0 rounded-full border-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-pink-500 data-[state=checked]:text-white",
-                        item.completed
-                          ? 'border-pink-500' // Ensure border is pink when checked
-                          : 'border-gray-300 hover:border-pink-400'
-                      )}
-                    />
+                    <div className="pt-0.5 sm:pt-0">
+                      <Checkbox 
+                        checked={!!item.completed}
+                        onCheckedChange={() => toggleComplete(item)}
+                        className={cn(
+                          "peer h-6 w-6 shrink-0 rounded-full border-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-pink-500 data-[state=checked]:text-white",
+                          item.completed
+                            ? 'border-pink-500' // Ensure border is pink when checked
+                            : 'border-gray-300 hover:border-pink-400'
+                        )}
+                      />
+                    </div>
 
                     <span
-                      className={`flex-1 transition-all duration-200 ${
+                      className={`flex-1 transition-all duration-200 break-words min-w-0 ${
                         item.completed
                           ? 'line-through text-gray-500'
                           : 'text-gray-800 font-medium'
@@ -337,7 +342,7 @@ export default function BucketList() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-600 hover:bg-red-50 p-2 active:scale-95 duration-200"
+                          className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-600 hover:bg-red-50 p-2 active:scale-95 duration-200 shrink-0"
                         >
                           <i className="fas fa-trash text-sm"></i>
                         </Button>
@@ -384,6 +389,7 @@ export default function BucketList() {
           )}
         </CardContent>
       </Card>
+      </div>
 
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
